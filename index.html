@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>矿产资源违规开采与生态修复对比</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        #chart-container {
+            width: 1000px;
+            height: 600px;
+            margin: 20px auto;
+        }
+        .header {
+            text-align: center;
+            padding: 15px 0;
+        }
+        h1 {
+            font-family: "Microsoft YaHei", sans-serif;
+            color: #333;
+            margin: 5px 0;
+            font-size: 24px;
+        }
+        .subtitle {
+            font-family: "Microsoft YaHei", sans-serif;
+            color: #666;
+            font-size: 14px;
+            margin: 10px 0 20px;
+            line-height: 1.6;
+        }
+        .note {
+            text-align: center;
+            font-family: "Microsoft YaHei", sans-serif;
+            color: #999;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>矿产资源违规开采与生态修复成效对比</h1>
+    <div class="subtitle">
+        <div>左侧：7个矿区违规开采情况（2023年督查数据）</div>
+        <div>右侧：全省生态修复进展（2024年2月统计数据 | 年度目标1500个千亩级森林斑块）</div>
+    </div>
+</div>
+<div id="chart-container"></div>
+<div class="note">注：越界开采面积对比矿业权许可面积2517亩；林分优化完成率3.1%</div>
+
+<script>
+    var myChart = echarts.init(document.getElementById('chart-container'));
+
+    // 数据准备
+    var violationData = [
+        { name: '越界开采面积', value: 1632, unit: '亩', ratio: '超许可64.8%' },
+        { name: '均通矿区超采量', value: 185, unit: '万m³', ratio: '4.2倍许可量' },
+        { name: '宏宝矿区超采量', value: 167, unit: '万m³', ratio: '5.9倍许可量' },
+        { name: '山体破坏面积', value: 55, unit: '亩', ratio: '形成深坑' }
+    ];
+
+    var restoreData = [
+        { name: '林分优化提升', value: 4.94, unit: '万亩', ratio: '完成率3.1%' },
+        { name: '植树活动场次', value: 1249, unit: '场' },
+        { name: '参与干部群众', value: 3.68, unit: '万人' },
+        { name: '新种植树木', value: 16, unit: '万株' }
+    ];
+
+    var option = {
+        grid: [
+            { left: '10%', top: '15%', width: '35%', height: '70%' },  // 左柱状图
+            { right: '10%', top: '15%', width: '35%', height: '70%' }   // 右柱状图
+        ],
+        tooltip: {
+            trigger: 'item',
+            formatter: function(params) {
+                var data = params.seriesIndex === 0 ? violationData : restoreData;
+                var item = data[params.dataIndex];
+                return [
+                    '<div style="font-weight:bold;margin-bottom:5px">' + item.name + '</div>',
+                    '数值：<span style="color:'+params.color+'">' + item.value + ' ' + item.unit + '</span>',
+                    item.ratio ? '<div style="margin-top:3px">' + item.ratio + '</div>' : ''
+                ].join('<br>');
+            }
+        },
+        xAxis: [
+            { // 左X轴（违规）
+                gridIndex: 0,
+                type: 'value',
+                axisLine: { lineStyle: { color: '#c23531', width: 2 } },
+                axisLabel: { color: '#c23531' },
+                splitLine: { show: false },
+                name: '违规量值',
+                nameLocation: 'end',
+                nameTextStyle: {
+                    color: '#c23531',
+                    padding: [0, 0, 0, 100]
+                }
+            },
+            { // 右X轴（修复）
+                gridIndex: 1,
+                type: 'value',
+                axisLine: { lineStyle: { color: '#61a0a8', width: 2 } },
+                axisLabel: { color: '#61a0a8' },
+                splitLine: { show: false },
+                name: '修复量值',
+                nameLocation: 'end',
+                nameTextStyle: {
+                    color: '#61a0a8',
+                    padding: [0, 0, 0, 100]
+                }
+            }
+        ],
+        yAxis: [
+            { // 左Y轴
+                gridIndex: 0,
+                type: 'category',
+                data: violationData.map(item => item.name),
+                axisLine: { show: false },
+                axisTick: { show: false },
+                axisLabel: {
+                    color: '#c23531',
+                    fontSize: 12,
+                    margin: 15
+                }
+            },
+            { // 右Y轴
+                gridIndex: 1,
+                type: 'category',
+                data: restoreData.map(item => item.name),
+                axisLine: { show: false },
+                axisTick: { show: false },
+                axisLabel: {
+                    color: '#61a0a8',
+                    fontSize: 12,
+                    margin: 15
+                }
+            }
+        ],
+        series: [
+            { // 左柱状图（违规）
+                name: '违规开采',
+                type: 'bar',
+                xAxisIndex: 0,
+                yAxisIndex: 0,
+                data: violationData.map(item => item.value),
+                itemStyle: {
+                    color: function(params) {
+                        var colorList = ['#c23531','#dd6b66','#e69d87','#edaf97'];
+                        return colorList[params.dataIndex];
+                    },
+                    borderRadius: [0, 5, 5, 0],
+                    shadowColor: 'rgba(0, 0, 0, 0.2)',
+                    shadowBlur: 5,
+                    shadowOffsetY: 2
+                },
+                label: {
+                    show: true,
+                    position: 'right',
+                    formatter: function(params) {
+                        return '{b|' + violationData[params.dataIndex].value + ' ' +
+                               violationData[params.dataIndex].unit + '}\n' +
+                               '{c|' + (violationData[params.dataIndex].ratio || '') + '}';
+                    },
+                    rich: {
+                        b: {
+                            color: '#c23531',
+                            fontWeight: 'bold',
+                            fontSize: 12
+                        },
+                        c: {
+                            color: '#666',
+                            fontSize: 11,
+                            padding: [2, 0, 0, 0]
+                        }
+                    }
+                },
+                barWidth: '40%'
+            },
+            { // 右柱状图（修复）
+                name: '生态修复',
+                type: 'bar',
+                xAxisIndex: 1,
+                yAxisIndex: 1,
+                data: restoreData.map(item => item.value),
+                itemStyle: {
+                    color: function(params) {
+                        var colorList = ['#61a0a8','#91c7ae','#749f83','#ca8622'];
+                        return colorList[params.dataIndex];
+                    },
+                    borderRadius: [0, 5, 5, 0],
+                    shadowColor: 'rgba(0, 0, 0, 0.2)',
+                    shadowBlur: 5,
+                    shadowOffsetY: 2
+                },
+                label: {
+                    show: true,
+                    position: 'right',
+                    formatter: function(params) {
+                        return '{b|' + restoreData[params.dataIndex].value + ' ' +
+                               restoreData[params.dataIndex].unit + '}\n' +
+                               '{c|' + (restoreData[params.dataIndex].ratio || '') + '}';
+                    },
+                    rich: {
+                        b: {
+                            color: '#61a0a8',
+                            fontWeight: 'bold',
+                            fontSize: 12
+                        },
+                        c: {
+                            color: '#666',
+                            fontSize: 11,
+                            padding: [2, 0, 0, 0]
+                        }
+                    }
+                },
+                barWidth: '40%'
+            }
+        ],
+        graphic: [
+            { // 完成率标注
+                type: 'text',
+                left: '75%',
+                top: '20%',
+                style: {
+                    text: '年度目标完成率：3.1%',
+                    fill: '#61a0a8',
+                    fontSize: 14,
+                    fontWeight: 'bold'
+                }
+            }
+        ]
+    };
+
+    myChart.setOption(option);
+    window.addEventListener('resize', function() {
+        myChart.resize();
+    });
+</script>
+</body>
+</html>
